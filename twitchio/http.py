@@ -46,11 +46,22 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("twitchio.http")
 
+'''
+Example configuration for local development using mock API
+TWITCH_BASE_URL=http://localhost:8080/mock
+TWITCH_TOKEN_BASE=http://localhost:8080/auth/token
+TWITCH_TOKEN_VALIDATE_URL=http://localhost:8080/auth/validate
+TWITCH_BASE_URL_SUFFIX=/mock/
+TWITCH_IRC_WS_URL='ws://localhost:3001'
+'''
 
 class Route:
 
+    
     # This needs to be configured for local testing
     BASE_URL = os.getenv('TWITCH_BASE_URL', default="https://api.twitch.tv/helix")
+    BASE_URL_SUFFIX = os.getenv('TWITCH_BASE_URL_SUFFIX', default=None)
+    
 
     __slots__ = "path", "body", "headers", "query", "method"
 
@@ -73,7 +84,10 @@ class Route:
         if isinstance(path, URL):
             self.path = path
         else:
-            self.path = URL(self.BASE_URL + "/" + path.rstrip("/"))
+            base = self.BASE_URL 
+            if self.BASE_URL_SUFFIX:
+                base+= self.BASE_URL_SUFFIX
+            self.path = URL(base +  path.rstrip("/"))
 
         if query:
             self.path = self.path.with_query(query)

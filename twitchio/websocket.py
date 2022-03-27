@@ -34,6 +34,7 @@ from functools import partial
 from typing import Union, Optional, List, TYPE_CHECKING
 
 import aiohttp
+import os
 
 from .backoff import ExponentialBackoff
 from .channel import Channel
@@ -47,8 +48,7 @@ if TYPE_CHECKING:
 
 
 log = logging.getLogger(__name__)
-HOST = "wss://irc-ws.chat.twitch.tv:443"
-
+HOST = os.getenv('TWITCH_IRC_WS_URL', default="wss://irc-ws.chat.twitch.tv:443")
 
 class WSConnection:
     def __init__(
