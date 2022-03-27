@@ -308,7 +308,7 @@ class TwitchHTTP:
         if not self.session:
             self.session = aiohttp.ClientSession()
 
-        url = "https://id.twitch.tv/oauth2/validate"
+        url = os.getenv('TWITCH_TOKEN_VALIDATE_URL', default="https://id.twitch.tv/oauth2/validate")
         headers = {"Authorization": f"OAuth {token}"}
 
         async with self.session.get(url, headers=headers) as resp:
