@@ -26,6 +26,7 @@ import asyncio
 import copy
 import datetime
 import logging
+import os
 from typing import TYPE_CHECKING, Union, List, Tuple, Any, Dict, Optional
 
 import aiohttp
@@ -48,7 +49,8 @@ logger = logging.getLogger("twitchio.http")
 
 class Route:
 
-    BASE_URL = "https://api.twitch.tv/helix"
+    # This needs to be configured for local testing
+    BASE_URL = os.getenv('TWITCH_BASE_URL', default="https://api.twitch.tv/helix")
 
     __slots__ = "path", "body", "headers", "query", "method"
 
@@ -85,7 +87,7 @@ class Route:
 
 class TwitchHTTP:
 
-    TOKEN_BASE = "https://id.twitch.tv/oauth2/token"
+    TOKEN_BASE = os.getenv('TWITCH_TOKEN_URL', default="https://id.twitch.tv/oauth2/token")
 
     def __init__(
         self, client: "Client", *, api_token: str = None, client_secret: str = None, client_id: str = None, **kwargs
