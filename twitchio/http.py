@@ -86,8 +86,9 @@ class Route:
         else:
             base = self.BASE_URL 
             if self.BASE_URL_SUFFIX:
-                base+= self.BASE_URL_SUFFIX
-            self.path = URL(base +  path.rstrip("/"))
+                self.path = URL(self.BASE_URL + self.BASE_URL_SUFFIX +  path.rstrip("/"))
+            else:
+                self.path = URL(self.BASEURL + path.rstrip("/"))
 
         if query:
             self.path = self.path.with_query(query)
