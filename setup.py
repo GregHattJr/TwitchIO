@@ -40,9 +40,6 @@ if on_rtd:
     with open("docs/requirements.txt") as f:
         requirements.extend(f.read().splitlines())
 
-with open(ROOT / "twitchio" / "__init__.py", encoding="utf-8") as f:
-    VERSION = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
-
 readme = ""
 with open("README.rst") as f:
     readme = f.read()
@@ -57,8 +54,8 @@ extras_require = {"sounds": sounds}
 setup(
     name="twitchio",
     author="TwitchIO",
-    url="https://github.com/TwitchIO/TwitchIO",
-    version=VERSION,
+    url="https://github.com/GregHattJr/TwitchIO",
+    version="2.2.0",
     packages=[
         "twitchio",
         "twitchio.ext.commands",
