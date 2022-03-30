@@ -43,7 +43,6 @@ except:
 if TYPE_CHECKING:
     from .client import Client
 
-
 logger = logging.getLogger("twitchio.http")
 
 '''
@@ -55,24 +54,22 @@ TWITCH_BASE_URL_SUFFIX=/mock/
 TWITCH_IRC_WS_URL='ws://localhost:3001'
 '''
 
-class Route:
 
-    
+class Route:
     # This needs to be configured for local testing
     BASE_URL = os.getenv('TWITCH_BASE_URL', default="https://api.twitch.tv/helix")
     BASE_URL_SUFFIX = os.getenv('TWITCH_BASE_URL_SUFFIX', default=None)
-    
 
     __slots__ = "path", "body", "headers", "query", "method"
 
     def __init__(
-        self,
-        method: str,
-        path: Union[str, URL],
-        body: Union[str, dict] = None,
-        query: List[Tuple[str, Any]] = None,
-        headers: dict = None,
-        token: str = None,
+            self,
+            method: str,
+            path: Union[str, URL],
+            body: Union[str, dict] = None,
+            query: List[Tuple[str, Any]] = None,
+            headers: dict = None,
+            token: str = None,
     ):
         self.headers = headers or {}
         self.method = method
@@ -84,11 +81,10 @@ class Route:
         if isinstance(path, URL):
             self.path = path
         else:
-            base = self.BASE_URL 
             if self.BASE_URL_SUFFIX:
-                self.path = URL(self.BASE_URL + self.BASE_URL_SUFFIX +  path.rstrip("/"))
+                self.path = URL(self.BASE_URL + self.BASE_URL_SUFFIX + path.rstrip("/"))
             else:
-                self.path = URL(self.BASEURL + path.rstrip("/"))
+                self.path = URL(self.BASE_URL + path.rstrip("/"))
 
         if query:
             self.path = self.path.with_query(query)
@@ -101,11 +97,10 @@ class Route:
 
 
 class TwitchHTTP:
-
     TOKEN_BASE = os.getenv('TWITCH_TOKEN_URL', default="https://id.twitch.tv/oauth2/token")
 
     def __init__(
-        self, client: "Client", *, api_token: str = None, client_secret: str = None, client_id: str = None, **kwargs
+            self, client: "Client", *, api_token: str = None, client_secret: str = None, client_id: str = None, **kwargs
     ):
         self.client = client
         self.session = None
@@ -237,7 +232,7 @@ class TwitchHTTP:
 
                 if 500 <= resp.status <= 504:
                     reason = resp.reason
-                    await asyncio.sleep(2**attempt + 1)
+                    await asyncio.sleep(2 ** attempt + 1)
                     continue
 
                 if utilize_bucket:
@@ -268,7 +263,7 @@ class TwitchHTTP:
                     reason = "Ratelimit Reached"
 
                     if not utilize_bucket:  # non Helix APIs don't have ratelimit headers
-                        await asyncio.sleep(3**attempt + 1)
+                        await asyncio.sleep(3 ** attempt + 1)
                     continue
 
                 raise errors.HTTPException(
@@ -292,10 +287,10 @@ class TwitchHTTP:
 
         if self._refresh_token:
             url = (
-                self.TOKEN_BASE
-                + "?grant_type=refresh_token&refresh_token={0}&client_id={1}&client_secret={2}".format(
-                    self._refresh_token, self.client_id, self.client_secret
-                )
+                    self.TOKEN_BASE
+                    + "?grant_type=refresh_token&refresh_token={0}&client_id={1}&client_secret={2}".format(
+                self._refresh_token, self.client_id, self.client_secret
+            )
             )
 
         else:
@@ -355,27 +350,27 @@ class TwitchHTTP:
             raise errors.HTTPException(data["message"], extra=data["retry_after"])
 
     async def get_extension_analytics(
-        self,
-        token: str,
-        extension_id: str = None,
-        type: str = None,
-        started_at: datetime.datetime = None,
-        ended_at: datetime.datetime = None,
+            self,
+            token: str,
+            extension_id: str = None,
+            type: str = None,
+            started_at: datetime.datetime = None,
+            ended_at: datetime.datetime = None,
     ):
         raise NotImplementedError  # TODO
 
     async def get_game_analytics(
-        self,
-        token: str,
-        game_id: str = None,
-        type: str = None,
-        started_at: datetime.datetime = None,
-        ended_at: datetime.datetime = None,
+            self,
+            token: str,
+            game_id: str = None,
+            type: str = None,
+            started_at: datetime.datetime = None,
+            ended_at: datetime.datetime = None,
     ):
         raise NotImplementedError  # TODO
 
     async def get_bits_board(
-        self, token: str, period: str = "all", user_id: str = None, started_at: datetime.datetime = None
+            self, token: str, period: str = "all", user_id: str = None, started_at: datetime.datetime = None
     ):
         assert period in {"all", "day", "week", "month", "year"}
         route = Route(
@@ -403,19 +398,19 @@ class TwitchHTTP:
         return await self.request(Route("GET", "extensions/transactions", "", query=q))
 
     async def create_reward(
-        self,
-        token: str,
-        broadcaster_id: int,
-        title: str,
-        cost: int,
-        prompt: str = None,
-        is_enabled: bool = True,
-        background_color: str = None,
-        user_input_required: bool = False,
-        max_per_stream: int = None,
-        max_per_user: int = None,
-        global_cooldown: int = None,
-        fufill_immediatly: bool = False,
+            self,
+            token: str,
+            broadcaster_id: int,
+            title: str,
+            cost: int,
+            prompt: str = None,
+            is_enabled: bool = True,
+            background_color: str = None,
+            user_input_required: bool = False,
+            max_per_stream: int = None,
+            max_per_user: int = None,
+            global_cooldown: int = None,
+            fufill_immediatly: bool = False,
     ):
         params = [("broadcaster_id", str(broadcaster_id))]
         data = {
@@ -453,24 +448,24 @@ class TwitchHTTP:
         return await self.request(Route("GET", "channel_points/custom_rewards", query=params, token=token))
 
     async def update_reward(
-        self,
-        token: str,
-        broadcaster_id: int,
-        reward_id: str,
-        title: str = None,
-        prompt: str = None,
-        cost: int = None,
-        background_color: str = None,
-        enabled: bool = None,
-        input_required: bool = None,
-        max_per_stream_enabled: bool = None,
-        max_per_stream: int = None,
-        max_per_user_per_stream_enabled: bool = None,
-        max_per_user_per_stream: int = None,
-        global_cooldown_enabled: bool = None,
-        global_cooldown: int = None,
-        paused: bool = None,
-        redemptions_skip_queue: bool = None,
+            self,
+            token: str,
+            broadcaster_id: int,
+            reward_id: str,
+            title: str = None,
+            prompt: str = None,
+            cost: int = None,
+            background_color: str = None,
+            enabled: bool = None,
+            input_required: bool = None,
+            max_per_stream_enabled: bool = None,
+            max_per_stream: int = None,
+            max_per_user_per_stream_enabled: bool = None,
+            max_per_user_per_stream: int = None,
+            global_cooldown_enabled: bool = None,
+            global_cooldown: int = None,
+            paused: bool = None,
+            redemptions_skip_queue: bool = None,
     ):
         data = {
             "title": title,
@@ -510,13 +505,13 @@ class TwitchHTTP:
         return await self.request(Route("DELETE", "channel_points/custom_rewards", query=params, token=token))
 
     async def get_reward_redemptions(
-        self,
-        token: str,
-        broadcaster_id: int,
-        reward_id: str,
-        redemption_id: str = None,
-        status: str = None,
-        sort: str = None,
+            self,
+            token: str,
+            broadcaster_id: int,
+            reward_id: str,
+            redemption_id: str = None,
+            status: str = None,
+            sort: str = None,
     ):
         params = [("broadcaster_id", str(broadcaster_id)), ("reward_id", reward_id)]
 
@@ -532,7 +527,7 @@ class TwitchHTTP:
         return await self.request(Route("GET", "channel_points/custom_rewards/redemptions", query=params, token=token))
 
     async def update_reward_redemption_status(
-        self, token: str, broadcaster_id: int, reward_id: str, custom_reward_id: str, status: bool
+            self, token: str, broadcaster_id: int, reward_id: str, custom_reward_id: str, status: bool
     ):
         params = [("id", custom_reward_id), ("broadcaster_id", str(broadcaster_id)), ("reward_id", reward_id)]
         status = "FULFILLED" if status else "CANCELLED"
@@ -547,10 +542,10 @@ class TwitchHTTP:
         )
 
     async def get_predictions(
-        self,
-        token: str,
-        broadcaster_id: int,
-        prediction_id: str = None,
+            self,
+            token: str,
+            broadcaster_id: int,
+            prediction_id: str = None,
     ):
         params = [("broadcaster_id", str(broadcaster_id))]
 
@@ -560,7 +555,7 @@ class TwitchHTTP:
         return await self.request(Route("GET", "predictions", query=params, token=token), paginate=False)
 
     async def patch_prediction(
-        self, token: str, broadcaster_id: int, prediction_id: str, status: str, winning_outcome_id: str = None
+            self, token: str, broadcaster_id: int, prediction_id: str, status: str, winning_outcome_id: str = None
     ):
         body = {
             "broadcaster_id": str(broadcaster_id),
@@ -581,7 +576,8 @@ class TwitchHTTP:
         )
 
     async def post_prediction(
-        self, token: str, broadcaster_id: int, title: str, blue_outcome: str, pink_outcome: str, prediction_window: int
+            self, token: str, broadcaster_id: int, title: str, blue_outcome: str, pink_outcome: str,
+            prediction_window: int
     ):
         body = {
             "broadcaster_id": broadcaster_id,
@@ -608,13 +604,13 @@ class TwitchHTTP:
         )
 
     async def get_clips(
-        self,
-        broadcaster_id: int = None,
-        game_id: str = None,
-        ids: List[str] = None,
-        started_at: datetime.datetime = None,
-        ended_at: datetime.datetime = None,
-        token: str = None,
+            self,
+            broadcaster_id: int = None,
+            game_id: str = None,
+            ids: List[str] = None,
+            started_at: datetime.datetime = None,
+            ended_at: datetime.datetime = None,
+            token: str = None,
     ):
         q = [
             ("broadcaster_id", broadcaster_id),
@@ -734,12 +730,12 @@ class TwitchHTTP:
         )
 
     async def get_streams(
-        self,
-        game_ids: List[str] = None,
-        user_ids: List[str] = None,
-        user_logins: List[str] = None,
-        languages: List[str] = None,
-        token: str = None,
+            self,
+            game_ids: List[str] = None,
+            user_ids: List[str] = None,
+            user_logins: List[str] = None,
+            languages: List[str] = None,
+            token: str = None,
     ):
         q = []
         if game_ids:
@@ -779,7 +775,7 @@ class TwitchHTTP:
         return await self.request(Route("GET", "channels", query=[("broadcaster_id", broadcaster_id)], token=token))
 
     async def patch_channel(
-        self, token: str, broadcaster_id: str, game_id: str = None, language: str = None, title: str = None
+            self, token: str, broadcaster_id: str, game_id: str = None, language: str = None, title: str = None
     ):
         assert any((game_id, language, title))
         body = {
@@ -793,12 +789,12 @@ class TwitchHTTP:
         )
 
     async def get_channel_schedule(
-        self,
-        broadcaster_id: str,
-        segment_ids: List[str] = None,
-        start_time: datetime.datetime = None,
-        utc_offset: int = None,
-        first: int = 20,
+            self,
+            broadcaster_id: str,
+            segment_ids: List[str] = None,
+            start_time: datetime.datetime = None,
+            utc_offset: int = None,
+            first: int = 20,
     ):
 
         if first is not None and (first > 25 or first < 1):
@@ -921,15 +917,15 @@ class TwitchHTTP:
         )["data"]
 
     async def get_videos(
-        self,
-        ids: List[str] = None,
-        user_id: str = None,
-        game_id: str = None,
-        sort: str = "time",
-        type: str = "all",
-        period: str = "all",
-        language: str = None,
-        token: str = None,
+            self,
+            ids: List[str] = None,
+            user_id: str = None,
+            game_id: str = None,
+            sort: str = "time",
+            type: str = "all",
+            period: str = "all",
+            language: str = None,
+            token: str = None,
     ):
         q = [
             x
